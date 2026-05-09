@@ -1,0 +1,68 @@
+{
+  "name": "egytronic",
+  "version": "1.0.0",
+  "masterModel": "Egytronic_1.0",
+  "providers": {
+    "cloudflare": {
+      "name": "Cloudflare Workers AI",
+      "apiUrl": "https://api.cloudflare.com/client/v4/accounts/{accountId}/ai/run/{model}",
+      "accountId": "",
+      "apiToken": "",
+      "models": [
+        "@cf/meta/llama-3-8b-instruct",
+        "@cf/meta/llama-3.1-8b-instruct",
+        "@cf/google/gemma-2-2b-it"
+      ],
+      "enabled": false
+    },
+    "gemini": {
+      "name": "Google Gemini",
+      "apiUrl": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+      "apiKey": "",
+      "models": [
+        "gemini-pro",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash"
+      ],
+      "enabled": false
+    },
+    "groq": {
+      "name": "Groq",
+      "apiUrl": "https://api.groq.com/openai/v1/chat/completions",
+      "apiKey": "",
+      "models": [
+        "llama-3-70b-8192",
+        "llama-3-8b-8192"
+      ],
+      "enabled": false
+    },
+    "anthropic": {
+      "name": "Anthropic Claude",
+      "apiUrl": "https://api.anthropic.com/v1/messages",
+      "apiKey": "",
+      "models": [
+        "claude-3-opus-20240229",
+        "claude-3-sonnet-20240229"
+      ],
+      "enabled": false
+    }
+  },
+  "tools": {
+    "browser": true,
+    "filesystem": true,
+    "terminal": true,
+    "vm": true,
+    "mcp": true,
+    "github": true,
+    "playwright": true,
+    "whatsapp": false,
+    "telegram": false
+  },
+  "config": {
+    "theme": "cyber",
+    "asciiArt": true,
+    "verbose": false,
+    "autoSave": true
+  },
+  "createdAt": "2026-05-09T16:11:10Z"
+}
