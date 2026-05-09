@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Egytronic AI Agent Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF6B35;
+      --primary-hover: #FF8C5A;
+      --secondary: #00F5D4;
+      --accent: #7B2CBF;
+      --bg-dark: #0A0E17;
+      --bg-card: #111827;
+      --bg-card-hover: #1A2332;
+      --bg-input: #1E293B;
+      --text-primary: #F0F4F8;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --border: #1E293B;
+      --success: #10B981;
+      --error: #EF4444;
+      --warning: #F59E0B;
+      --cyan: #22D3EE;
+      --purple: #A855F7;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    .bg-animation {
+      position: fixed; inset: 0; z-index: -1;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255,107,53,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0,245,212,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(123,44,191,0.05) 0%, transparent 50%);
+      animation: bgPulse 15s ease-in-out infinite;
+    }
+    @keyframes bgPulse {
+      0%,100%{transform:scale(1)} 50%{transform:scale(1.05)}
+    }
+
+    /* Grid pattern */
+    .grid-pattern {
+      position: fixed; inset: 0; z-index: -1;
+      background-image: linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Header */
+    header {
+      background: rgba(10,14,23,0.95);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+    .header-content {
+      display: flex; justify-content: space-between; align-items: center;
+      max-width: 1800px; margin: 0 auto;
+    }
+    .logo { display: flex; align-items: center; gap: 1rem; }
+    .logo-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 1.4rem; color: var(--bg-dark);
+    }
+    .logo-text {
+      font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-status { display: flex; align-items: center; gap: 1rem; }
+    .status-badge {
+      padding: 0.5rem 1rem;
+      background: rgba(16,185,129,0.15);
+      color: var(--success);
+      border-radius: 20px;
+      font-size: 0.8rem; font-weight: 600;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    /* Main Layout */
+    main {
+      max-width: 1800px; margin: 0 auto; padding: 1.5rem;
+      display: grid; grid-template-columns: 260px 1fr 320px;
+      gap: 1.5rem;
+      height: calc(100vh - 80px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .nav-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .nav-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateX(4px);
+      border-color: var(--primary);
+    }
+    .nav-card.active {
+      background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(123,44,191,0.15));
+      border-color: var(--primary);
+    }
+    .nav-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .nav-title { font-weight: 600; margin-bottom: 0.25rem; }
+    .nav-desc { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Content Area */
+    .content {
+      display: flex; flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .content-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .content-title { font-weight: 600; font-size: 1.1rem; }
+    .content-body {
+      flex: 1; overflow-y: auto; padding: 1rem;
+    }
+
+    /* Provider Cards */
+    .provider-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .provider-card {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .provider-card:hover { transform: translateY(-2px); border-color: var(--secondary); }
+    .provider-card.selected {
+      border-color: var(--success);
+      background: rgba(16,185,129,0.1);
+    }
+    .provider-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .provider-name { font-weight: 600; }
+    .provider-status {
+      padding: 0.25rem 0.75rem;
+      background: rgba(16,185,129,0.15);
+      color: var(--success);
+      border-radius: 12px;
+      font-size: 0.7rem;
+    }
+    .model-list {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .model-tag {
+      padding: 0.3rem 0.6rem;
+      background: var(--bg-dark);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+    }
+
+    /* Chat */
+    .chat-container { display: flex; flex-direction: column; height: 100%; }
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 1rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .message {
+      max-width: 80%;
+      padding: 1rem 1.25rem;
+      border-radius: 16px;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: var(--bg-dark);
+    }
+    .message.assistant {
+      align-self: flex-start;
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+    }
+    .message-time {
+      font-size: 0.65rem; color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+    .chat-input-area {
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 0.75rem;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 0.875rem 1rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .chat-input:focus { border-color: var(--primary); }
+    .chat-input::placeholder { color: var(--text-muted); }
+    .send-btn {
+      padding: 0.875rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .send-btn:hover { transform: scale(1.05); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Code Editor */
+    .editor-container { display: flex; flex-direction: column; height: 100%; }
+    .editor-toolbar {
+      display: flex; gap: 0.5rem; padding: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .editor-btn {
+      padding: 0.4rem 0.8rem;
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .editor-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .code-editor {
+      flex: 1;
+      padding: 1rem;
+      background: #0D1117;
+      border: none;
+      color: #C9D1D9;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+    }
+
+    /* Terminal */
+    .terminal-container {
+      display: flex; flex-direction: column;
+      background: #0D1117;
+      border-radius: 12px;
+      overflow: hidden;
+      height: 100%;
+    }
+    .terminal-header {
+      background: #161B22;
+      padding: 0.5rem 1rem;
+      display: flex; gap: 0.5rem;
+    }
+    .terminal-btn { width: 12px; height: 12px; border-radius: 50%; }
+    .terminal-btn.red { background: #FF5F56; }
+    .terminal-btn.yellow { background: #FFBD2E; }
+    .terminal-btn.green { background: #27C93F; }
+    .terminal-output {
+      flex: 1; padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #7EE787;
+      overflow-y: auto;
+    }
+    .terminal-input-area {
+      display: flex; padding: 0.5rem 1rem 1rem;
+      border-top: 1px solid #30363D;
+    }
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #7EE787;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .stat-card {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: relative;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: var(--primary);
+    }
+    .stat-card.secondary::before { background: var(--secondary); }
+    .stat-card.purple::before { background: var(--purple); }
+    .stat-card.cyan::before { background: var(--cyan); }
+    .stat-label {
+      font-size: 0.7rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .stat-value {
+      font-size: 1.75rem; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 0.5rem;
+    }
+
+    /* Tools Panel */
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    .tool-card {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tool-card:hover { border-color: var(--primary); }
+    .tool-card.active {
+      background: rgba(0,245,212,0.1);
+      border-color: var(--secondary);
+    }
+    .tool-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .tool-name { font-weight: 600; font-size: 0.85rem; }
+    .tool-status {
+      font-size: 0.7rem; color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Automation Scheduler */
+    .automation-list {
+      display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .automation-card {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .automation-info { display: flex; flex-direction: column; gap: 0.25rem; }
+    .automation-name { font-weight: 600; }
+    .automation-schedule { font-size: 0.75rem; color: var(--text-muted); }
+    .automation-toggle {
+      width: 48px; height: 26px;
+      background: var(--bg-dark);
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .automation-toggle.active { background: var(--success); }
+    .automation-toggle::after {
+      content: ''; position: absolute;
+      top: 3px; left: 3px;
+      width: 20px; height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+    .automation-toggle.active::after { left: 25px; }
+
+    /* MCP Connector */
+    .mcp-server-list {
+      display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .mcp-server-card {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .mcp-header {
+      display: flex; justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .mcp-name { font-weight: 600; }
+    .mcp-status {
+      padding: 0.2rem 0.5rem;
+      background: rgba(16,185,129,0.15);
+      color: var(--success);
+      border-radius: 8px;
+      font-size: 0.65rem;
+    }
+    .mcp-tools {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+    }
+    .mcp-tool-tag {
+      padding: 0.25rem 0.5rem;
+      background: var(--bg-dark);
+      border-radius: 6px;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+    }
+
+    /* Settings */
+    .settings-section {
+      margin-bottom: 1.5rem;
+    }
+    .settings-title {
+      font-weight: 600;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-row {
+      display: flex; justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+    }
+    .settings-label { font-size: 0.9rem; }
+    .settings-input {
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      width: 200px;
+    }
+    .settings-toggle {
+      width: 44px; height: 24px;
+      background: var(--bg-dark);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+    }
+    .settings-toggle.active { background: var(--success); }
+    .settings-toggle::after {
+      content: ''; position: absolute;
+      top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    /* Loading */
+    .typing-indicator {
+      display: flex; gap: 0.4rem; padding: 1rem;
+    }
+    .typing-dot {
+      width: 8px; height: 8px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: typingPulse 1.4s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingPulse {
+      0%,100%{opacity:0.3} 50%{opacity:1}
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* Responsive */
+    @media (max-width: 1400px) {
+      main { grid-template-columns: 220px 1fr; }
+      .right-panel { display: none; }
+    }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      .sidebar { flex-direction: row; overflow-x: auto; }
+      .nav-card { min-width: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+  <div class="grid-pattern"></div>
+
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">E</div>
+        <span class="logo-text">Egytronic</span>
+      </div>
+      <div class="header-status">
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          <span>AI Online</span>
+        </div>
+        <div class="status-badge">
+          <span>Master: Egytronic_1.0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="nav-card active" data-panel="chat">
+        <div class="nav-icon">💬</div>
+        <div class="nav-title">Chat</div>
+        <div class="nav-desc">AI Conversation</div>
+      </div>
+      <div class="nav-card" data-panel="providers">
+        <div class="nav-icon">📡</div>
+        <div class="nav-title">Providers</div>
+        <div class="nav-desc">AI Provider Config</div>
+      </div>
+      <div class="nav-card" data-panel="tools">
+        <div class="nav-icon">🔧</div>
+        <div class="nav-title">Tools</div>
+        <div class="nav-desc">Agent Tools</div>
+      </div>
+      <div class="nav-card" data-panel="editor">
+        <div class="nav-icon">💻</div>
+        <div class="nav-title">Code Editor</div>
+        <div class="nav-desc">Write & Execute</div>
+      </div>
+      <div class="nav-card" data-panel="terminal">
+        <div class="nav-icon">⌨️</div>
+        <div class="nav-title">Terminal</div>
+        <div class="nav-desc">Command Line</div>
+      </div>
+      <div class="nav-card" data-panel="automation">
+        <div class="nav-icon">🤖</div>
+        <div class="nav-title">Automation</div>
+        <div class="nav-desc">Task Scheduler</div>
+      </div>
+      <div class="nav-card" data-panel="mcp">
+        <div class="nav-icon">🔗</div>
+        <div class="nav-title">MCP</div>
+        <div class="nav-desc">Server Connector</div>
+      </div>
+      <div class="nav-card" data-panel="stats">
+        <div class="nav-icon">📊</div>
+        <div class="nav-title">Stats</div>
+        <div class="nav-desc">Usage Analytics</div>
+      </div>
+      <div class="nav-card" data-panel="settings">
+        <div class="nav-icon">⚙️</div>
+        <div class="nav-title">Settings</div>
+        <div class="nav-desc">Configuration</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="content" id="mainContent">
+      <!-- Chat Panel -->
+      <div id="chatPanel" class="panel">
+        <div class="content-header">
+          <h2 class="content-title">💬 AI Chat</h2>
+          <select id="chatModel" style="padding: 0.4rem 0.8rem; background: var(--bg-card-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+            <option value="@cf/meta/llama-3-8b-instruct">Llama 3 8B</option>
+            <option value="@cf/meta/llama-3.1-8b-instruct">Llama 3.1 8B</option>
+            <option value="@cf/google/gemma-2-2b-it">Gemma 2B</option>
+          </select>
+        </div>
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="message assistant">
+              Hello! I'm Egytronic, your AI coding assistant. How can I help you today?
+              <div class="message-time">Just now</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeypress="handleChatKey(event)">
+            <button class="send-btn" onclick="sendMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Providers Panel -->
+      <div id="providersPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">📡 AI Providers</h2>
+        </div>
+        <div class="content-body">
+          <div class="provider-grid">
+            <div class="provider-card selected" onclick="selectProvider(this, 'cloudflare')">
+              <div class="provider-header">
+                <span class="provider-name">☁️ Cloudflare AI</span>
+                <span class="provider-status">Active</span>
+              </div>
+              <div class="model-list">
+                <span class="model-tag">Llama 3 8B</span>
+                <span class="model-tag">Llama 3.1 8B</span>
+                <span class="model-tag">Gemma 2B</span>
+              </div>
+            </div>
+            <div class="provider-card" onclick="selectProvider(this, 'gemini')">
+              <div class="provider-header">
+                <span class="provider-name">🌐 Google Gemini</span>
+                <span class="provider-status">Ready</span>
+              </div>
+              <div class="model-list">
+                <span class="model-tag">Gemini Pro</span>
+                <span class="model-tag">Gemini Flash</span>
+              </div>
+            </div>
+            <div class="provider-card" onclick="selectProvider(this, 'groq')">
+              <div class="provider-header">
+                <span class="provider-name">⚡ Groq</span>
+                <span class="provider-status">Ready</span>
+              </div>
+              <div class="model-list">
+                <span class="model-tag">Llama 3 70B</span>
+                <span class="model-tag">Mixtral 8x7B</span>
+              </div>
+            </div>
+            <div class="provider-card" onclick="selectProvider(this, 'anthropic')">
+              <div class="provider-header">
+                <span class="provider-name">🧠 Anthropic</span>
+                <span class="provider-status">Ready</span>
+              </div>
+              <div class="model-list">
+                <span class="model-tag">Claude 3 Opus</span>
+                <span class="model-tag">Claude 3 Sonnet</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tools Panel -->
+      <div id="toolsPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">🔧 Agent Tools</h2>
+        </div>
+        <div class="content-body">
+          <div class="tools-grid">
+            <div class="tool-card active">
+              <div class="tool-icon">🌐</div>
+              <div class="tool-name">Browser</div>
+              <div class="tool-status">Enabled</div>
+            </div>
+            <div class="tool-card active">
+              <div class="tool-icon">📁</div>
+              <div class="tool-name">FileSystem</div>
+              <div class="tool-status">Enabled</div>
+            </div>
+            <div class="tool-card active">
+              <div class="tool-icon">💻</div>
+              <div class="tool-name">Terminal</div>
+              <div class="tool-status">Enabled</div>
+            </div>
+            <div class="tool-card active">
+              <div class="tool-icon">🖥️</div>
+              <div class="tool-name">VM</div>
+              <div class="tool-status">Enabled</div>
+            </div>
+            <div class="tool-card active">
+              <div class="tool-icon">🔗</div>
+              <div class="tool-name">MCP</div>
+              <div class="tool-status">Enabled</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">🐙</div>
+              <div class="tool-name">GitHub</div>
+              <div class="tool-status">Disabled</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">🎭</div>
+              <div class="tool-name">Playwright</div>
+              <div class="tool-status">Disabled</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">💬</div>
+              <div class="tool-name">WhatsApp</div>
+              <div class="tool-status">Disabled</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editor Panel -->
+      <div id="editorPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">💻 Code Editor</h2>
+          <button class="send-btn" onclick="runCode()" style="padding: 0.5rem 1rem; font-size: 0.85rem;">▶ Run</button>
+        </div>
+        <div class="editor-container">
+          <div class="editor-toolbar">
+            <button class="editor-btn" onclick="formatCode()">Format</button>
+            <button class="editor-btn" onclick="saveCode()">Save</button>
+            <button class="editor-btn" onclick="clearEditor()">Clear</button>
+          </div>
+          <textarea class="code-editor" id="codeEditor" placeholder="// Write your code here..."># Python Example
+def fibonacci(n):
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+
+# Print first 10 Fibonacci numbers
+print(list(fibonacci(10)))</textarea>
+        </div>
+      </div>
+
+      <!-- Terminal Panel -->
+      <div id="terminalPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">⌨️ Terminal</h2>
+          <button class="send-btn" onclick="clearTerminal()" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Clear</button>
+        </div>
+        <div class="terminal-container">
+          <div class="terminal-header">
+            <div class="terminal-btn red"></div>
+            <div class="terminal-btn yellow"></div>
+            <div class="terminal-btn green"></div>
+          </div>
+          <div class="terminal-output" id="terminalOutput">
+            <div>egytronic@agent:~$ welcome to egytronic terminal v1.0.0</div>
+            <div>type 'help' for available commands</div>
+            <div>---</div>
+          </div>
+          <div class="terminal-input-area">
+            <span style="color: var(--success);">$</span>
+            <input type="text" class="terminal-input" id="terminalInput" onkeypress="handleTerminalKey(event)" placeholder="Enter command...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Automation Panel -->
+      <div id="automationPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">🤖 Automation Scheduler</h2>
+          <button class="send-btn" onclick="addAutomation()" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">+ Add</button>
+        </div>
+        <div class="content-body">
+          <div class="automation-list">
+            <div class="automation-card">
+              <div class="automation-info">
+                <div class="automation-name">Daily Report</div>
+                <div class="automation-schedule">Every day at 9:00 AM</div>
+              </div>
+              <div class="automation-toggle active" onclick="toggleAutomation(this)"></div>
+            </div>
+            <div class="automation-card">
+              <div class="automation-info">
+                <div class="automation-name">Code Review</div>
+                <div class="automation-schedule">Every hour</div>
+              </div>
+              <div class="automation-toggle" onclick="toggleAutomation(this)"></div>
+            </div>
+            <div class="automation-card">
+              <div class="automation-info">
+                <div class="automation-name">Backup</div>
+                <div class="automation-schedule">Every day at midnight</div>
+              </div>
+              <div class="automation-toggle active" onclick="toggleAutomation(this)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MCP Panel -->
+      <div id="mcpPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">🔗 MCP Servers</h2>
+          <button class="send-btn" onclick="addMcpServer()" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">+ Connect</button>
+        </div>
+        <div class="content-body">
+          <div class="mcp-server-list">
+            <div class="mcp-server-card">
+              <div class="mcp-header">
+                <span class="mcp-name">🐙 GitHub MCP</span>
+                <span class="mcp-status">Connected</span>
+              </div>
+              <div class="mcp-tools">
+                <span class="mcp-tool-tag">createIssue</span>
+                <span class="mcp-tool-tag">createPR</span>
+                <span class="mcp-tool-tag">addComment</span>
+                <span class="mcp-tool-tag">getRepo</span>
+              </div>
+            </div>
+            <div class="mcp-server-card">
+              <div class="mcp-header">
+                <span class="mcp-name">🐳 Docker MCP</span>
+                <span class="mcp-status">Connected</span>
+              </div>
+              <div class="mcp-tools">
+                <span class="mcp-tool-tag">run</span>
+                <span class="mcp-tool-tag">build</span>
+                <span class="mcp-tool-tag">start</span>
+                <span class="mcp-tool-tag">stop</span>
+              </div>
+            </div>
+            <div class="mcp-server-card">
+              <div class="mcp-header">
+                <span class="mcp-name">☁️ AWS MCP</span>
+                <span class="mcp-status" style="background: rgba(239,68,68,0.15); color: var(--error);">Disconnected</span>
+              </div>
+              <div class="mcp-tools">
+                <span class="mcp-tool-tag">ec2</span>
+                <span class="mcp-tool-tag">s3</span>
+                <span class="mcp-tool-tag">lambda</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Panel -->
+      <div id="statsPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">📊 Usage Statistics</h2>
+        </div>
+        <div class="content-body">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Requests</div>
+              <div class="stat-value">1,247</div>
+            </div>
+            <div class="stat-card secondary">
+              <div class="stat-label">Tokens Used</div>
+              <div class="stat-value">89.3K</div>
+            </div>
+            <div class="stat-card purple">
+              <div class="stat-label">Active Sessions</div>
+              <div class="stat-value">12</div>
+            </div>
+            <div class="stat-card cyan">
+              <div class="stat-label">Uptime</div>
+              <div class="stat-value">99.9%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Panel -->
+      <div id="settingsPanel" class="panel" style="display:none;">
+        <div class="content-header">
+          <h2 class="content-title">⚙️ Settings</h2>
+        </div>
+        <div class="content-body">
+          <div class="settings-section">
+            <div class="settings-title">General</div>
+            <div class="settings-row">
+              <span class="settings-label">Master Model</span>
+              <select class="settings-input" style="width: auto;">
+                <option>Egytronic_1.0</option>
+                <option>Custom</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Default Provider</span>
+              <select class="settings-input" style="width: auto;">
+                <option>Cloudflare</option>
+                <option>Gemini</option>
+                <option>Groq</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Streaming Response</span>
+              <div class="settings-toggle active" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-title">Tools</div>
+            <div class="settings-row">
+              <span class="settings-label">Browser Automation</span>
+              <div class="settings-toggle active" onclick="toggleSetting(this)"></div>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">FileSystem Access</span>
+              <div class="settings-toggle active" onclick="toggleSetting(this)"></div>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Terminal</span>
+              <div class="settings-toggle active" onclick="toggleSetting(this)"></div>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">MCP Integration</span>
+              <div class="settings-toggle active" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-title">API Keys</div>
+            <div class="settings-row">
+              <span class="settings-label">Cloudflare Token</span>
+              <input type="password" class="settings-input" value="••••••••••••">
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Anthropic Key</span>
+              <input type="password" class="settings-input" value="••••••••••••">
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">OpenAI Key</span>
+              <input type="password" class="settings-input" value="••••••••••••">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Panel - Quick Actions -->
+    <aside class="sidebar right-panel">
+      <div class="nav-card" style="cursor: default;">
+        <div class="nav-icon">⚡</div>
+        <div class="nav-title">Quick Actions</div>
+      </div>
+      <div class="nav-card" onclick="sendQuickMessage('Write a hello world in Python')">
+        <div class="nav-title">Python Hello World</div>
+        <div class="nav-desc">Quick code snippet</div>
+      </div>
+      <div class="nav-card" onclick="sendQuickMessage('Explain what is Cloudflare Workers AI')">
+        <div class="nav-title">Learn About AI</div>
+        <div class="nav-desc">Ask AI a question</div>
+      </div>
+      <div class="nav-card" onclick="switchPanel('editor')">
+        <div class="nav-title">Code Editor</div>
+        <div class="nav-desc">Write and run code</div>
+      </div>
+      <div class="nav-card" onclick="switchPanel('terminal')">
+        <div class="nav-title">Terminal</div>
+        <div class="nav-desc">Run shell commands</div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // API Configuration - User provides their own keys
+    // Cloudflare: Get from https://dash.cloudflare.com/profile/api-tokens
+    // Gemini: Get from https://aistudio.google.com/app/apikey
+    const CF_TOKEN = ''; // User fills in
+    const CF_ACCOUNT_ID = ''; // User fills in
+
+    // Current state
+    let selectedProvider = 'cloudflare';
+    let selectedModel = '@cf/meta/llama-3-8b-instruct';
+
+    // Navigation
+    document.querySelectorAll('.nav-card[data-panel]').forEach(card => {
+      card.addEventListener('click', () => {
+        const panel = card.dataset.panel;
+        switchPanel(panel);
+      });
+    });
+
+    function switchPanel(panelName) {
+      document.querySelectorAll('.nav-card').forEach(c => c.classList.remove('active'));
+      document.querySelector(`[data-panel="${panelName}"]`)?.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      document.getElementById(panelName + 'Panel').style.display = 'flex';
+      document.getElementById('mainContent').style.display = 'flex';
+    }
+
+    // Chat
+    function handleChatKey(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const messages = document.getElementById('chatMessages');
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Add user message
+      messages.innerHTML += `
+        <div class="message user">
+          ${message}
+          <div class="message-time">${new Date().toLocaleTimeString()}</div>
+        </div>
+      `;
+      input.value = '';
+
+      // Show typing indicator
+      messages.innerHTML += `
+        <div class="message assistant" id="typingIndicator">
+          <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      `;
+      messages.scrollTop = messages.scrollHeight;
+
+      try {
+        const response = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${selectedModel}`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${CF_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              messages: [
+                { role: 'system', content: 'You are Egytronic, a helpful AI coding assistant. Be concise and technical.' },
+                { role: 'user', content: message }
+              ]
+            })
+          }
+        );
+
+        const data = await response.json();
+        
+        // Remove typing indicator
+        document.getElementById('typingIndicator')?.remove();
+
+        // Add assistant response
+        messages.innerHTML += `
+          <div class="message assistant">
+            ${data.result?.response || 'No response'}
+            <div class="message-time">${new Date().toLocaleTimeString()}</div>
+          </div>
+        `;
+        messages.scrollTop = messages.scrollHeight;
+      } catch (error) {
+        document.getElementById('typingIndicator')?.remove();
+        messages.innerHTML += `
+          <div class="message assistant" style="border-color: var(--error);">
+            Error: ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    function sendQuickMessage(msg) {
+      document.getElementById('chatInput').value = msg;
+      switchPanel('chat');
+      sendMessage();
+    }
+
+    // Provider selection
+    function selectProvider(card, provider) {
+      document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedProvider = provider;
+    }
+
+    // Editor
+    function formatCode() {
+      const editor = document.getElementById('codeEditor');
+      try {
+        const formatted = JSON.stringify(JSON.parse(editor.value), null, 2);
+        editor.value = formatted;
+      } catch {
+        // Not JSON, leave as is
+      }
+    }
+
+    function saveCode() {
+      localStorage.setItem('egytronic-code', document.getElementById('codeEditor').value);
+      alert('Code saved!');
+    }
+
+    function clearEditor() {
+      document.getElementById('codeEditor').value = '';
+    }
+
+    function runCode() {
+      const code = document.getElementById('codeEditor').value;
+      const output = document.getElementById('terminalOutput');
+      output.innerHTML += `<div>$ node -e "${code.substring(0, 50)}..."</div>`;
+      output.innerHTML += `<div style="color: var(--success);">[Code executed - results would appear here]</div>`;
+      output.innerHTML += '<div>---</div>';
+      output.scrollTop = output.scrollHeight;
+    }
+
+    // Terminal
+    function handleTerminalKey(e) {
+      if (e.key === 'Enter') executeTerminal();
+    }
+
+    function executeTerminal() {
+      const input = document.getElementById('terminalInput');
+      const output = document.getElementById('terminalOutput');
+      const cmd = input.value.trim();
+      if (!cmd) return;
+
+      output.innerHTML += `<div>$ ${cmd}</div>`;
+      
+      // Simulate commands
+      if (cmd === 'help') {
+        output.innerHTML += `<div>Available commands: help, ls, pwd, date, clear, whoami</div>`;
+      } else if (cmd === 'clear') {
+        output.innerHTML = `<div>egytronic@agent:~$ </div>`;
+      } else if (cmd === 'date') {
+        output.innerHTML += `<div>${new Date().toString()}</div>`;
+      } else if (cmd === 'whoami') {
+        output.innerHTML += `<div>egytronic</div>`;
+      } else {
+        output.innerHTML += `<div style="color: var(--text-muted);">[Command not available in browser demo]</div>`;
+      }
+      output.innerHTML += '<div>---</div>';
+      input.value = '';
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearTerminal() {
+      document.getElementById('terminalOutput').innerHTML = '<div>egytronic@agent:~$ cleared</div><div>---</div>';
+    }
+
+    // Automation
+    function toggleAutomation(el) {
+      el.classList.toggle('active');
+    }
+
+    function addAutomation() {
+      alert('Add new automation - feature coming soon!');
+    }
+
+    // MCP
+    function addMcpServer() {
+      alert('Connect new MCP server - feature coming soon!');
+    }
+
+    // Settings
+    function toggleSetting(el) {
+      el.classList.toggle('active');
+    }
+
+    // Load saved code
+    const savedCode = localStorage.getItem('egytronic-code');
+    if (savedCode) {
+      document.getElementById('codeEditor').value = savedCode;
+    }
+  </script>
+</body>
+</html>

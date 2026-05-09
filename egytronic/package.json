@@ -1,0 +1,69 @@
+{
+  "name": "@egytronic/agent-framework",
+  "version": "1.0.0",
+  "description": "Egytronic AI Agent Framework - Build intelligent agents with multi-provider AI support (Windows 7/8/10/11, Linux, Mac)",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "egytronic": "./cli/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "cli": "node cli/index.js",
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start:prod": "next start -p 3000",
+    "test": "node cli/index.js test",
+    "setup": "node cli/index.js setup"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "llm",
+    "cloudflare",
+    "ollama",
+    "gemini",
+    "anthropic",
+    "openai",
+    "zhipu",
+    "glm",
+    "egytronic",
+    "windows",
+    "windows-7",
+    "cpu",
+    "x64",
+    "x86"
+  ],
+  "author": "Egytronic",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egytronic/agent-framework"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "conf": "^12.0.0",
+    "express": "^4.19.2"
+  },
+  "optionalDependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "os": [
+    "win32",
+    "linux",
+    "darwin"
+  ],
+  "cpu": [
+    "x64",
+    "x86"
+  ],
+  "funding": {
+    "type": "individual",
+    "url": "https://egytronic.ai"
+  }
+}

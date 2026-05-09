@@ -1,0 +1,32 @@
+{
+  "name": "@egytronic/agent-framework",
+  "version": "1.0.0",
+  "description": "Egytronic AI Agent Framework - Build intelligent agents with multi-provider AI support",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "egytronic": "./cli/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "cli": "node cli/index.js",
+    "dashboard": "node -e \"import('./gui/dashboard.html')\"",
+    "test": "node cli/index.js test",
+    "setup": "node cli/index.js setup"
+  },
+  "keywords": ["ai", "agent", "llm", "cloudflare", "gemini", "anthropic", "egytronic"],
+  "author": "Egytronic",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egytronic/agent-framework"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "conf": "^12.0.0",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
