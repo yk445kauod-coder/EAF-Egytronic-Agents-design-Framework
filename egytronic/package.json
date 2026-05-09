@@ -1,52 +1,32 @@
 {
-  "name": "egytronic",
+  "name": "@egytronic/agent-framework",
   "version": "1.0.0",
-  "description": "Egytronic AI Agent Framework - Build Agents. Empower Intelligence.",
+  "description": "Egytronic AI Agent Framework - Build intelligent agents with multi-provider AI support",
+  "type": "module",
   "main": "src/index.js",
   "bin": {
-    "egytronic": "./bin/egytronic.js"
+    "egytronic": "./cli/index.js"
   },
-  "type": "module",
   "scripts": {
-    "start": "node bin/egytronic.js",
-    "gui": "node bin/egytronic.js gui",
-    "test": "node bin/egytronic.js test",
-    "test:cloudflare": "node bin/egytronic.js test --provider cloudflare",
-    "test:gemini": "node bin/egytronic.js test --provider gemini"
+    "start": "node src/index.js",
+    "cli": "node cli/index.js",
+    "dashboard": "node -e \"import('./gui/dashboard.html')\"",
+    "test": "node cli/index.js test",
+    "setup": "node cli/index.js setup"
   },
-  "keywords": [
-    "ai",
-    "agent",
-    "framework",
-    "cloudflare",
-    "gemini",
-    "anthropic",
-    "openai",
-    "llm",
-    "automation",
-    "egytronic"
-  ],
+  "keywords": ["ai", "agent", "llm", "cloudflare", "gemini", "anthropic", "egytronic"],
   "author": "Egytronic",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egytronic/agent-framework"
+  },
   "dependencies": {
     "chalk": "^5.3.0",
-    "blessed": "^0.1.81",
     "conf": "^12.0.0",
-    "dotenv": "^16.4.5",
-    "ora": "^5.4.1",
-    "inquirer": "^9.2.23",
-    "axios": "^1.7.2",
-    "puppeteer": "^22.12.1",
-    "playwright": "^1.44.1",
-    "ws": "^8.17.1",
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5",
-    "open": "^10.1.0",
-    "shelljs": "^0.8.5",
-    "yaml": "^2.4.5",
-    "uuid": "^9.0.1",
-    "marked": "^12.0.2",
-    "boxen": "^7.1.1"
+    "express": "^4.19.2"
   },
-  "preferGlobal": true
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
